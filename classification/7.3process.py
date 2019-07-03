@@ -6,16 +6,16 @@ import sklearn
 from sklearn import model_selection
 
 
-def Dummy(column):
-    """
-    将一列categorical variable转换成dummy
-    :param column: 需要被转换的一列dataframe
-    :return: 被转换后的该列dataframe
-    """
-    one_hot = preprocessing.OneHotEncoder(sparse=False)
-    new_array = one_hot.fit_transform(column)
-    new_df = pd.DataFrame(new_array, columns=one_hot.categories_)
-    return new_df
+def Dummy(df):
+    cat_col = []
+    for i in df.columns:
+        if df[i].dtype != 'int64' and df[i].dtype != 'float64':
+            cat_col.append(i)
+    cat_df = df[cat_col]
+    dummy_df = pd.get_dummies(cat_df,prefix=cat_df.columns).shape
+    df.drop(columns=cat_col)
+    ret_df = pd.concat([dummy_df, df], axis=1)
+    return ret_df
 
 
 def cat(df):
