@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
 import joblib
 import warnings
 import copy
@@ -78,8 +81,10 @@ class ClassificationTrain:
             self._connect_SQL(**json_file)
             self.set_params(**json_file["model_params"])
             features = self.get_data_features(**json_file)
-            self.fit(features, self.get_data_label(**json_file).values.ravel())
+            label = self.get_data_label(**json_file).values.ravel()
+            self.fit(features, label)
             self._model.columns = features.columns.values.tolist()
+            self._model.label = label.columns.values.tolist()
             self.save_model(json_file["save_path"]) #暂时保存
             return "success"
         except Exception as e:
@@ -93,6 +98,7 @@ class ClassificationTrain:
             self.set_params(**json["model_params"])
             self.fit(features, labels)
             self._model.columns = json['data_columns']
+            self._model.label = json["label_columns"]
             self.save_model(json["save_path"])  # 暂时保存
             return "success"
         except Exception as e:
@@ -106,6 +112,7 @@ class ClassificationTrain:
             self.set_params(**json["model_params"])
             self.fit(features, labels)
             self._model.columns = json['data_columns']
+            self._model.label = json["label_columns"]
             self.save_model(json["save_path"])  # 暂时保存
             return "success"
         except Exception as e:

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
 import pandas as pd
 import joblib
 from sqlcon.sqlserver.sqlserver import SQLServer
@@ -11,9 +14,6 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from xgboost.sklearn import XGBClassifier
 from sklearn.ensemble import AdaBoostClassifier
-
-
-
 
 
 class ClassificationPredict:
@@ -86,6 +86,9 @@ class ClassificationPredict:
             self.load_model(**json)
             features = pd.read_excel(json["path"], usecols=self._model.columns)
             pre = self._model.predict(features)
+            predf = pd.DataFrame(pre)
+            predf.columns = self._model.label
+            predf.to_csv(json["save_path"], index=False)
             return {"info": "success", "pre_value" : pre}
         except Exception as e:
             print(e)
@@ -96,6 +99,9 @@ class ClassificationPredict:
             self.load_model(**json)
             features = pd.read_csv(json["path"], usecols=self._model.columns)
             pre = self._model.predict(features)
+            predf = pd.DataFrame(pre)
+            predf.columns = self._model.label
+            predf.to_csv(json["save_path"], index=False)
             return {"info": "success", "pre_value" : pre}
         except Exception as e:
             print(e)
@@ -226,16 +232,9 @@ class AdaBoostPredict(ClassificationPredict):
 
 if __name__ == "__main__":
     jsn = {
-        "model_params": {},
-        "path": "test2.csv",
-        "data_columns": ['组织组', '总金额(元)', '销售组织单位', '运算加权总金额(元)', '客户类型', '客户级别',
-                         '一级行业', '二级行业', '三级行业', '浪潮所属行业部', '行业部二级部门', '城市',
-                         '预计招标类型', '项目公司1属性', '项目级别', '获得途径', '是否指名客户', '客户预算来源',
-                         '客户预算', '商机产生背景', '采购特点', '技术方案是否已有', '是否存在竞争对手',
-                         '评标环节可控制', '合作渠道招标方关系好', '用户或采购方表态支持', '标书指标倾向浪潮',
-                         '总体规划方案已有', '项目招标方案已有', '是否老客户', '负责员工职位'],
-        "label_columns": ['是否中标'],
-        "model_path": "model.pkl"
+        "path": "D:/pro1/test2.csv",
+        "model_path": "D:/pro1/model1.pkl",
+        "save_path": "D:/pro1/response.csv"
     }
     test1 = LogisticRegressionPredict()
     print(test1.predict_from_csv(**jsn))
