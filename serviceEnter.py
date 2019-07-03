@@ -99,7 +99,6 @@ def classification(jdata):
 
 def classificationPredict(jdata):
     algtype = jdata["algtype"]
-    reData = "None"
     if algtype == "decisionTree":
         model = ClassificationPredict()
         reMess = model.predict_from_csv(**jdata)
@@ -137,6 +136,7 @@ if __name__ == "__main__":
 	}
 }
 
+分类预测入参：
 {
             "id":1,
             "algtype":"logistic",
@@ -150,5 +150,15 @@ if __name__ == "__main__":
                              "总体规划方案已有", "项目招标方案已有", "是否老客户", "负责员工职位"],
             "label_columns": ["是否中标"],
             "save_path": "D:/pro1/classification/model.pkl"
+}
+
+
+分类预测入参：
+{
+            "id":1,
+            "algtype":"logistic",
+            "path": "D:/pro1/test2.csv",
+            "model_path": "D:/pro1/model1.pkl",
+            "save_path": "D:/pro1/response.csv"
 }
 """
