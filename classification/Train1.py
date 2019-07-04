@@ -170,7 +170,7 @@ class ClassificationTrainFromSklearn(ClassificationTrain):
         """
         for k in new_params.keys():
             if k not in self._get_valid_params():
-                warnings.warn("传入参数含有模型中不包含的参数")
+                raise ValueError("传入参数含有模型中不包含的参数")
                 break
         feed_dict = {k: v for k, v in new_params.items() if k in self._get_valid_params()}
         if len(feed_dict) == 0:

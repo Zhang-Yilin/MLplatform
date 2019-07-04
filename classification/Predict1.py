@@ -30,8 +30,8 @@ class ClassificationPredict:
 
     def predict(self, data):
         columns = data.columns.values.tolist()
-        for i in columns:
-            if i not in self._model.columns:
+        for i in self._model.columns:
+            if i not in columns:
                 raise ValueError("输入值包含训练集中不存在的列")
         _data = data[self._model.columns]
         return self._model.predict(_data)
@@ -111,7 +111,12 @@ class ClassificationPredict:
         try:
             self.load_model(**json)
             pre = self._model.predict(self.get_data_features(**json))
-            return "success", pre
+            predf = pd.DataFrame(pre)
+            predf.columns = self._model.label
+            predf.to_csv(json["save_path"], index=False)
+            write = self.SQL.df_write_sqlserver(table=json['dbinfo']['outputtable'], df=pre,
+                                                cols=json['data_columns'])
+            return {"info": write, "pre_value" : pre}
         except Exception as e:
             print(e)
             return 'failed,{e}'.format(e=e)
