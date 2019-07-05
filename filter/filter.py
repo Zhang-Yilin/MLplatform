@@ -169,7 +169,7 @@ class IsolationForestFilter(filterFromSklearn):
 
 class OneClassSVMFilter(filterFromSklearn):
     def __init__(self, name="SVM过滤"):
-        self._model = IsolationForest()
+        self._model = OneClassSVM()
         self.name = name
 
 
