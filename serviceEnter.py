@@ -10,6 +10,8 @@ from alg.kmeans.kmeans_test import KMeansTest
 from classification.Train1 import *
 from classification.Predict1 import *
 from sklearn.exceptions import *
+from regression.regressionTrain import *
+from regression.regressionPredict import *
 from classification.score import ClassificationScore
 
 app = Flask(__name__)
@@ -60,7 +62,29 @@ def getTest():
         resMess = classificationPredict(jdata=reqMess)
         return jsonify({"id": id,"info":resMess["info"], "value": str(resMess["pre_value"])})
 
-@app.route("/score/", methods=["POST"])
+@app.route("/regression/", methods=["POST"])
+def postTest():
+    if not request.json or "id" not in request.json or "algtype" not in request.json:
+        abort(400)
+    else:
+        reqMess = request.json
+        print(reqMess)
+        id = reqMess["id"]
+        resMess = regression(jdata=reqMess)
+        return jsonify({"id": id,"info": resMess})
+
+@app.route("/regression/", methods=["GET"])
+def getTest():
+    if not request.json or "id" not in request.json or "algtype" not in request.json:
+        abort(400)
+    else:
+        reqMess = request.json
+        print(reqMess)
+        id = reqMess["id"]
+        resMess = regressionPredict(jdata=reqMess)
+        return jsonify({"id": id,"info":resMess["info"], "value": str(resMess["pre_value"])})
+
+@app.route("/classificationscore/", methods=["POST"])
 def scoreTask():
     if not request.json or "id" not in request.json:
         abort(400)
@@ -98,7 +122,7 @@ def classification(jdata):
     algtype = jdata["algtype"].lower()
     reMess = ""
     if algtype == "decisiontree":
-        model = ClassificationTrain()
+        model = DecisionTreeTrain()
     elif algtype == "logistic":
         model = LogisticRegressionTrain()
     elif algtype == "randomforest":
@@ -106,7 +130,7 @@ def classification(jdata):
     elif algtype == "gradientboosting":
         model = GradientBoostingTrain()
     elif algtype == "mlp" or algtype == "neuronnetwork":
-        model = RandomForestTrain()
+        model = MLPTrain()
     elif algtype == "lineardiscriminantanalysis" or algtype == "lda":
         model = LinearDiscriminantAnalysisTrain()
     elif algtype == "svm":
@@ -128,7 +152,7 @@ def classification(jdata):
 def classificationPredict(jdata):
     algtype = jdata["algtype"]
     if algtype == "decisionTree":
-        model = ClassificationPredict()
+        model = DecisionTreePredict()
         reMess = model.predict_from_csv(**jdata)
     elif algtype == "logistic":
         model = LogisticRegressionPredict()
@@ -156,6 +180,63 @@ def classificationPredict(jdata):
         reMess = model.predict_from_csv(**jdata)
     elif algtype == "adaboost":
         model = AdaBoostPredict()
+        reMess = model.predict_from_csv(**jdata)
+    else:
+        reMess = "failed, algtype must be an algorithm type"
+    return reMess
+
+def regression(jdata):
+    algtype = jdata["algtype"].lower()
+    reMess = ""
+    if algtype == "svm" or algtype == "svr":
+        model = SVRTrain()
+    elif algtype == "linearregression":
+        model = LinearRegressionTrain()
+    elif algtype == "decisiontreeregressor":
+        model = DecisionTreeRegressorTrain()
+    elif algtype == "gradientboostingregressor":
+        model =GradientBoostingRegressorTrain()
+    elif algtype == "mlpregressor" or algtype == "neuronnetworkregressor":
+        model = MLPRegressorTrain()
+    elif algtype == "isotonicregression":
+        model = IsotonicRegressionTrain()
+    elif algtype == "polynomialregression":
+        model = PolynomialRegressionTrain()
+    elif algtype == "randomforestregressor":
+        model = RandomForestRegressorTrain()
+    else:
+        reMess = "failed, algtype must be an algorithm type"
+    if "failed, algtype must be an algorithm type" != reMess:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", category=ConvergenceWarning)
+            reMess = model.train_from_csv(**jdata)
+    return reMess
+
+def regressionPredict(jdata):
+    algtype = jdata["algtype"]
+    if algtype == "svm" or algtype == "svr":
+        model = SVRPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "linearregression":
+        model = LinearRegressionPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "gradientboostingregressor":
+        model = GradientBoostingRegressorPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "decisiontreeregressor":
+        model = DecisionTreeRegressorPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "mlpregressor" or algtype == "neuronnetworkregressor":
+        model = MLPRegressorPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "isotonicregression":
+        model = IsotonicRegressionPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "polynomialregression":
+        model = PolynomialRegressionPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "randomforestregressor":
+        model = RandomForestRegressorPredict()
         reMess = model.predict_from_csv(**jdata)
     else:
         reMess = "failed, algtype must be an algorithm type"
