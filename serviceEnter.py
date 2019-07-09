@@ -10,6 +10,7 @@ from alg.kmeans.kmeans_test import KMeansTest
 from classification.Train1 import *
 from classification.Predict1 import *
 from sklearn.exceptions import *
+from classification.score import ClassificationScore
 
 app = Flask(__name__)
 
@@ -37,7 +38,7 @@ def getTask():
         resMess = bus(jdata=reqMess)
         return jsonify({"id": id,"info":resMess})
 
-@app.route("/classificationtest/", methods=["POST"])
+@app.route("/classification/", methods=["POST"])
 def postTest():
     if not request.json or "id" not in request.json or "algtype" not in request.json:
         abort(400)
@@ -48,7 +49,7 @@ def postTest():
         resMess = classification(jdata=reqMess)
         return jsonify({"id": id,"info": resMess})
 
-@app.route("/classificationtest/", methods=["GET"])
+@app.route("/classification/", methods=["GET"])
 def getTest():
     if not request.json or "id" not in request.json or "algtype" not in request.json:
         abort(400)
@@ -58,6 +59,18 @@ def getTest():
         id = reqMess["id"]
         resMess = classificationPredict(jdata=reqMess)
         return jsonify({"id": id,"info":resMess["info"], "value": str(resMess["pre_value"])})
+
+@app.route("/score/", methods=["POST"])
+def scoreTask():
+    if not request.json or "id" not in request.json:
+        abort(400)
+    else:
+        reqMess = request
+        id = reqMess["id"]
+        resMess = getscore(jdata=reqMess)
+        return jsonify({"id": id, "info": resMess["info"], "accuracy": resMess["score"]})
+
+
 
 
 def bus(jdata):
@@ -82,19 +95,34 @@ def bus(jdata):
     return reMess
 
 def classification(jdata):
-    algtype = jdata["algtype"]
-    if algtype == "decisionTree":
+    algtype = jdata["algtype"].lower()
+    reMess = ""
+    if algtype == "decisiontree":
         model = ClassificationTrain()
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", category=ConvergenceWarning)
-            reMess = model.train_from_csv(**jdata)
     elif algtype == "logistic":
         model = LogisticRegressionTrain()
+    elif algtype == "randomforest":
+        model = RandomForestTrain()
+    elif algtype == "gradientboosting":
+        model = GradientBoostingTrain()
+    elif algtype == "mlp" or algtype == "neuronnetwork":
+        model = RandomForestTrain()
+    elif algtype == "lineardiscriminantanalysis" or algtype == "lda":
+        model = LinearDiscriminantAnalysisTrain()
+    elif algtype == "svm":
+        model = SVMTrain()
+    elif algtype == "knn":
+        model = KNNTrain()
+    elif algtype == "xgradientboosting" or algtype == "xgboosting":
+        model = XGradientBoostingTrain()
+    elif algtype == "adaboost":
+        model = AdaBoostTrain()
+    else:
+        reMess = "failed, algtype must be an algorithm type"
+    if "failed, algtype must be an algorithm type" != reMess:
         with warnings.catch_warnings():
             warnings.simplefilter("error", category=ConvergenceWarning)
             reMess = model.train_from_csv(**jdata)
-    else:
-        reMess = "failed, algtype must be an algorithm type"
     return reMess
 
 def classificationPredict(jdata):
@@ -105,8 +133,37 @@ def classificationPredict(jdata):
     elif algtype == "logistic":
         model = LogisticRegressionPredict()
         reMess = model.predict_from_csv(**jdata)
+    elif algtype == "randomforest":
+        model = RandomForestPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "gradientboosting":
+        model = GradientBoostingPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "mlp" or algtype == "neuronnetwork":
+        model = MLPPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "lineardiscriminantanalysis" or algtype == "lda":
+        model = LinearDiscriminantAnalysisPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "svm":
+        model = SVMPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "knn":
+        model = KNNPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "xgradientboosting" or algtype == "xgboosting":
+        model = XGradientBoostingPredict()
+        reMess = model.predict_from_csv(**jdata)
+    elif algtype == "adaboost":
+        model = AdaBoostPredict()
+        reMess = model.predict_from_csv(**jdata)
     else:
         reMess = "failed, algtype must be an algorithm type"
+    return reMess
+
+def getscore(jdata):
+    scoremodel = ClassificationScore()
+    reMess = scoremodel.response(**jdata)
     return reMess
 
 
@@ -160,5 +217,11 @@ if __name__ == "__main__":
             "path": "D:/pro1/test2.csv",
             "model_path": "D:/pro1/model1.pkl",
             "save_path": "D:/pro1/response.csv"
+}
+
+{
+        "id":1
+        "path": "D:/pro1/response.csv",
+        "origin_path": "D:/pro1/test2.csv"
 }
 """

@@ -127,9 +127,7 @@ class ClassificationTrain:
         """
         try:
             joblib.dump(self._model, model_path)
-            files_md5 = os.popen(model_path).read().strip()
-            return files_md5
-
+            return "success"
         except Exception as e:
             print(e)
             return 'failed,{e}'.format(e=e)
@@ -227,6 +225,7 @@ class LogisticRegressionTrain(ClassificationTrainFromSklearn):
     def return_importance(self, type = "positive", ):
         pass
 
+
 class RandomForestTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="随机森林"):
         self.name = name
@@ -242,6 +241,10 @@ class RandomForestTrain(ClassificationTrainFromSklearn):
         """
         super().set_params(**new_params)
 
+    def get_importantce(self):
+        return self._model.feature_importances_
+
+
 class GradientBoostingTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="梯度提升决策树"):
         self.name = name
@@ -256,7 +259,11 @@ class GradientBoostingTrain(ClassificationTrainFromSklearn):
         """
         super().set_params(**new_params)
 
-class MLPTRain(ClassificationTrainFromSklearn):
+    def get_importantce(self):
+        return self._model.feature_importances_
+
+
+class MLPTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="神经网络"):
         self.name = name
         self._model = MLPClassifier()
@@ -269,6 +276,7 @@ class MLPTRain(ClassificationTrainFromSklearn):
         """
         super().set_params(**new_params)
 
+
 class LinearDiscriminantAnalysisTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="线性判别"):
         self.name = name
@@ -279,6 +287,7 @@ class LinearDiscriminantAnalysisTrain(ClassificationTrainFromSklearn):
         :return:
         """
         super().set_params(**new_params)
+
 
 class SVMTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="SVM"):
@@ -293,6 +302,7 @@ class SVMTrain(ClassificationTrainFromSklearn):
         """
         super().set_params(**new_params)
 
+
 class KNNTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="KNN"):
         self.name = name
@@ -305,6 +315,7 @@ class KNNTrain(ClassificationTrainFromSklearn):
         :return:
         """
         super().set_params(**new_params)
+
 
 class XGradientBoostingTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="Xgboost"):
@@ -322,6 +333,10 @@ class XGradientBoostingTrain(ClassificationTrainFromSklearn):
         :return:
         """
         super().set_params(**new_params)
+
+        def get_importantce(self):
+            return self._model.feature_importances_
+
 
 class AdaBoostTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="Adaboost"):
