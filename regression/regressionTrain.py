@@ -153,6 +153,9 @@ class MLPRegressorTrain(ClassificationTrainFromSklearn):
 
 
 class IsotonicRegressionTrain(ClassificationTrainFromSklearn):
+    """
+    输入值只能包含一列
+    """
     def __init__(self, name="保续回归"):
         self.name = name
         self._model = IsotonicRegression()
@@ -206,7 +209,7 @@ class RandomForestRegressorTrain(ClassificationTrainFromSklearn):
 
 if __name__=="__main__":
     jsn = {
-            "model_params": {"n_estimators": 500},
+            "model_params": {},
             "path": "D:/pro1/test2.csv",
             "data_columns": ["组织组", "总金额(元)", "销售组织单位", "运算加权总金额(元)", "客户类型", "客户级别",
                              "一级行业", "二级行业", "三级行业", "浪潮所属行业部", "行业部二级部门", "城市",
@@ -220,6 +223,5 @@ if __name__=="__main__":
 
     import pandas as pd
     k = pd.read_csv("D:/pro1/test2.csv")
-    print(k.iloc[0,:])
-    test = RandomForestRegressorTrain()
-    test.train_from_csv(**jsn)
+    test = LinearRegressionTrain()
+    print(test.train_from_csv(**jsn))

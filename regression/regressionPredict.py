@@ -116,5 +116,5 @@ if "__main__" == __name__:
         "model_path": "D:/pro1/model1.pkl",
         "save_path": "D:/pro1/response.csv"
     }
-    test1 = RandomForestRegressorPredict()
+    test1 = LinearRegressionPredict()
     print(test1.predict_from_csv(**jsn))

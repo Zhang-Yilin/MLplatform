@@ -13,6 +13,7 @@ from sklearn.exceptions import *
 from regression.regressionTrain import *
 from regression.regressionPredict import *
 from classification.score import ClassificationScore
+from regression.score import RegressionScore
 
 app = Flask(__name__)
 
@@ -94,7 +95,15 @@ def scoreTask():
         resMess = getscore(jdata=reqMess)
         return jsonify({"id": id, "info": resMess["info"], "accuracy": resMess["score"]})
 
-
+@app.route("/classificationscore/", methods=["POST"])
+def scoreTask():
+    if not request.json or "id" not in request.json:
+        abort(400)
+    else:
+        reqMess = request
+        id = reqMess["id"]
+        resMess =regressionScore(jdata=reqMess)
+        return jsonify({"id": id, "info": resMess["info"], "accuracy": resMess["score"]})
 
 
 def bus(jdata):
@@ -247,6 +256,10 @@ def getscore(jdata):
     reMess = scoremodel.response(**jdata)
     return reMess
 
+def regressionScore(jdata):
+    scoremodel = RegressionScore()
+    reMess = scoremodel.response(**jdata)
+    return reMess
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=6666, debug=True)  #, debug=True
@@ -274,7 +287,7 @@ if __name__ == "__main__":
 	}
 }
 
-分类预测入参：
+分类,回归训练入参：
 {
             "id":1,
             "algtype":"logistic",
@@ -291,7 +304,7 @@ if __name__ == "__main__":
 }
 
 
-分类预测入参：
+分类，回归预测入参：
 {
             "id":1,
             "algtype":"logistic",
@@ -300,6 +313,7 @@ if __name__ == "__main__":
             "save_path": "D:/pro1/response.csv"
 }
 
+分类，回归打分入参
 {
         "id":1
         "path": "D:/pro1/response.csv",
