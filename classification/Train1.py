@@ -38,6 +38,9 @@ class ClassificationTrain:
     def fit(self, x, y):
         pass
 
+    def self_predict(self, x):
+        pass
+
     def _connect_SQL(self, **json_file):
         """
         连接到SQL
@@ -83,6 +86,11 @@ class ClassificationTrain:
             features = self.get_data_features(**json_file)
             label = self.get_data_label(**json_file).values.ravel()
             self.fit(features, label)
+            pre_data = (self.self_predict(features))
+            """
+            pre_data为预测信息
+            可输出到表
+            """
             self._model.columns = features.columns.values.tolist()
             self._model.label = label.columns.values.tolist()
             self.save_model(json_file["save_path"]) #暂时保存
@@ -97,6 +105,11 @@ class ClassificationTrain:
             labels = pd.read_csv(json["path"], usecols=json['label_columns']).values.ravel()
             self.set_params(**json["model_params"])
             self.fit(features, labels)
+            pre_data = (self.self_predict(features))
+            """
+            pre_data为预测信息
+            可输出到表
+            """
             self._model.columns = json['data_columns']
             self._model.label = json["label_columns"]
             self.save_model(json["save_path"])  # 暂时保存
@@ -111,6 +124,11 @@ class ClassificationTrain:
             labels = pd.read_excel(json["path"], usecols=json['label_columns']).values.ravel()
             self.set_params(**json["model_params"])
             self.fit(features, labels)
+            pre_data = (self.self_predict(features))
+            """
+            pre_data为预测信息
+            可输出到表
+            """
             self._model.columns = json['data_columns']
             self._model.label = json["label_columns"]
             self.save_model(json["save_path"])  # 暂时保存
@@ -179,9 +197,17 @@ class ClassificationTrainFromSklearn(ClassificationTrain):
         """
         :param x: 训练数据
         :param y: 训练数据标签
-        :return: 训练数据准确率
+        :return:
         """
         self._model.fit(x, y)
+
+    def self_predict(self, x):
+        """
+        :param x: 训练数据
+        :param y: 训练数据标签
+        :return: 训练数据预测标签
+        """
+        return self._model.predict(x)
 
 
 class DecisionTreeTrain(ClassificationTrainFromSklearn):
@@ -207,6 +233,7 @@ class DecisionTreeTrain(ClassificationTrainFromSklearn):
 
     def get_plot(self):
         pass
+
 
 class LogisticRegressionTrain(ClassificationTrainFromSklearn):
     def __init__(self, name="逻辑回归"):
@@ -370,5 +397,19 @@ if __name__ == "__main__":
 
     test = LogisticRegressionTrain()
     test.train_from_csv(**jsn)
+    t = test.get_model()
+
+    import sys
+    import csv
+    import os
+
+    input_path = 'D:/pro1/Iris.csv'  # campaign 基础文件固定位置
+    with open(input_path, 'a') as input_csv:
+        x = pd.read_csv('D:/pro1/Iris.csv')
+        v = list(x.iloc[:,3])
+        csv_write = csv.writer(input_csv)
+        csv_write.writerow(v)
+
+
 
 
