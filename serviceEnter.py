@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
 """
 @file :serviceEnter.py
 @date :2019/5/5
@@ -160,7 +163,7 @@ def classification(jdata):
 
 def classificationPredict(jdata):
     algtype = jdata["algtype"]
-    if algtype == "decisionTree":
+    if algtype == "decisiontree":
         model = DecisionTreePredict()
         reMess = model.predict_from_csv(**jdata)
     elif algtype == "logistic":

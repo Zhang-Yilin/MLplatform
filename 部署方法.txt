@@ -1,0 +1,21 @@
+在nginx的nginx.conf文件中加入    
+server {
+        listen       6666;
+        server_name  flasktest;
+        location / {
+          proxy_pass http://127.0.0.1:5000;
+          proxy_redirect default;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection $http_connection;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Host $http_host;
+        }
+(监听6666号端口，转至本机5000号端口)
+
+运行 gunicorn -c config.py  serviceEnter:app
+其中config.py为gevent配置文件，serviceEnter.py为flask文件
+
+运行 sudo /usr/local/nginx/sbin/nginx
+
+连接 ip:6666运行
