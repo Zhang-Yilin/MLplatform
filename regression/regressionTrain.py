@@ -3,7 +3,6 @@
 
 import joblib
 from classification.Train1 import ClassificationTrainFromSklearn, ClassificationTrain
-from alg.regression.regression import Regression
 from sklearn.base import RegressorMixin
 from sklearn.svm import SVR
 from sklearn.linear_model import ElasticNet
