@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
+#! /usr/bin/env python3
 
 """
 @file :serviceEnter.py
@@ -9,7 +8,6 @@
 
 from flask import Flask, abort, request, jsonify
 
-from alg.kmeans.kmeans_test import KMeansTest
 from classification.Train1 import *
 from classification.Predict1 import *
 from sklearn.exceptions import *
@@ -22,30 +20,8 @@ app = Flask(__name__)
 
 tasks = []
 
-@app.route("/", methods=["POST"])
-def postTask():
-    if not request.json or "id" not in request.json or "acttype" not in request.json:
-        abort(400)
-    else:
-        reqMess = request.json
-        print(reqMess)
-        id = reqMess["id"]
-        resMess = bus(jdata=reqMess)
-        return jsonify({"id": id,"info":resMess})
-
-@app.route("/", methods=["GET"])
-def getTask():
-    if not request.json or "id" not in request.json or "acttype" not in request.json:
-        abort(400)
-    else:
-        reqMess = request.json
-        print(reqMess)
-        id = reqMess["id"]
-        resMess = bus(jdata=reqMess)
-        return jsonify({"id": id,"info":resMess})
-
 @app.route("/classification/", methods=["POST"])
-def postTest():
+def postTest1():
     if not request.json or "id" not in request.json or "algtype" not in request.json:
         abort(400)
     else:
@@ -56,7 +32,7 @@ def postTest():
         return jsonify({"id": id,"info": resMess})
 
 @app.route("/classification/", methods=["GET"])
-def getTest():
+def getTest1():
     if not request.json or "id" not in request.json or "algtype" not in request.json:
         abort(400)
     else:
@@ -64,10 +40,10 @@ def getTest():
         print(reqMess)
         id = reqMess["id"]
         resMess = classificationPredict(jdata=reqMess)
-        return jsonify({"id": id,"info":resMess["info"], "value": str(resMess["pre_value"])})
+        return jsonify({"id": id,"info":resMess["info"]})
 
 @app.route("/regression/", methods=["POST"])
-def postTest():
+def postTest2():
     if not request.json or "id" not in request.json or "algtype" not in request.json:
         abort(400)
     else:
@@ -78,7 +54,7 @@ def postTest():
         return jsonify({"id": id,"info": resMess})
 
 @app.route("/regression/", methods=["GET"])
-def getTest():
+def getTesk2():
     if not request.json or "id" not in request.json or "algtype" not in request.json:
         abort(400)
     else:
@@ -99,7 +75,7 @@ def scoreTask():
         return jsonify({"id": id, "info": resMess["info"], "accuracy": resMess["score"]})
 
 @app.route("/classificationscore/", methods=["POST"])
-def scoreTask():
+def scoreTask1():
     if not request.json or "id" not in request.json:
         abort(400)
     else:
@@ -108,27 +84,6 @@ def scoreTask():
         resMess =regressionScore(jdata=reqMess)
         return jsonify({"id": id, "info": resMess["info"], "accuracy": resMess["score"]})
 
-
-def bus(jdata):
-    algtype = jdata["algtype"]
-    acttype = jdata["acttype"]
-    reMess = ""
-    # 0是训练，1是预测
-    if "0" == acttype:
-        if "kmeans"==algtype:
-            kMeansTest = KMeansTest()
-            reMess = kMeansTest.train_section(jdata)
-        else:
-            reMess = "failed,algtype must be an algorithm type"
-    elif "1" == acttype:
-        if "kmeans" == algtype:
-            kMeansTest = KMeansTest()
-            reMess = kMeansTest.predict_section(jdata)
-        else:
-            reMess = "failed,algtype must be an algorithm type"
-    else:
-        reMess = "failed,acttype must be in 0 or 1,0 means training,1 means prediction"
-    return reMess
 
 def classification(jdata):
     algtype = jdata["algtype"].lower()
@@ -163,7 +118,7 @@ def classification(jdata):
 
 def classificationPredict(jdata):
     algtype = jdata["algtype"]
-    if algtype == "decisiontree":
+    if algtype == "decisionTree":
         model = DecisionTreePredict()
         reMess = model.predict_from_csv(**jdata)
     elif algtype == "logistic":
@@ -264,8 +219,12 @@ def regressionScore(jdata):
     reMess = scoremodel.response(**jdata)
     return reMess
 
+
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=6666, debug=True)  #, debug=True
+    from werkzeug.contrib.fixers import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+    app.run()
+    app.run(host="0.0.0.0", port = 11024)  #, debug=True
 
 
 
